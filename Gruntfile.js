@@ -124,7 +124,7 @@ module.exports = function (grunt) {
                     expand: true,
                     cwd: '<%= yeoman.app %>/scripts',
                     src: '*.coffee',
-                    dest: '.tmp/scripts',
+                    dest: '<%= yeoman.app %>/scripts',
                     ext: '.js'
                 }]
             },
@@ -227,7 +227,7 @@ module.exports = function (grunt) {
                     cwd: '<%= yeoman.app %>',
                     dest: '<%= yeoman.dist %>',
                     src: [
-                        '*.{ico,txt}',
+                        '*.{ico,txt,html}',
                         '.htaccess',
                         'images/{,*/}*.{webp,gif}'
                     ]
@@ -283,7 +283,7 @@ module.exports = function (grunt) {
         'compass:dist',
         'useminPrepare',
         'imagemin',
-        'htmlmin',
+        //'htmlmin', <- this thing breaks badly on 
         'concat',
         'cssmin',
         'uglify',

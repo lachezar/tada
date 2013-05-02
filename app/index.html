@@ -6,13 +6,13 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title></title>
+        <title>Ta-da. It's short for da-ta-ta-da.</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-        <link rel="stylesheet" href="styles/main.css">
-        <!-- build : js scripts/vendor/modernizr.js -->
-        <!-- script src="components/modernizr/modernizr.js"></script -->
+        <link rel="stylesheet" href="/static/app/styles/main.css">
+        <!-- build:js scripts/vendor/modernizr.js -->
+        <script src="/static/app/components/modernizr/modernizr.js"></script>
         <!-- endbuild -->
     </head>
     <body>
@@ -20,11 +20,14 @@
             <div class="hero-unit">
                 <h1>Tada</h1>
                 <p>Your tasks are:</p>
-                <ul>
+                <ul id="task-list">
                     {% for task in tasks %}
-                    <li>
-                        <input type="checkbox" {%- if task.done -%}checked="checked"{% endif %} /> 
-                        <span {%- if task.done -%}class="done"{% endif %}>{{ task.title }}</span>
+                    <li data-id="{{ task.id }}">
+                        <div class="view">
+                            <input class="toggle" type="checkbox" {%- if task.done -%}checked="checked"{% endif %}/>
+                            <label>{{ task.title }}</label>
+                        </div>
+                        <input class="edit" type="text" value="{{ task.title }}" />
                     </li>
                     {% endfor %}
                 </ul>
@@ -35,18 +38,31 @@
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
         
-        <script id="task-template" type="text/x-handlebars-template">
+        <script type="text/javascript">
+            var preloadedTasks = {{ tasks_dict|tojson|safe }};
         </script>
+        
+        {% raw %}
+        <script id="task-template" type="text/x-mustache-template">
+            <div class="view">
+              <input class="toggle" type="checkbox" {{#done}}checked="checked"{{/done}} />
+              <label>{{ title }}</label>
+            </div>
+            <input class="edit" type="text" value="{{ title }}" />
+        </script>
+        <script id="remaining-template" type="text/x-mustache-template">
+        </script>
+        {% endraw %}
 
         <!-- build:js scripts/vendor.js -->
-        <script src="components/jquery/jquery.min.js"></script>
-        <script src="components/lodash/dist/lodash.backbone.min.js"></script>
-        <script src="components/backbone.handlebars/backbone.handlebars.min.js"></script>
-        <script src="components/backbone/backbone-min.js"></script>
+        <script src="/static/app/components/jquery/jquery.min.js"></script>
+        <script src="/static/app/components/lodash/dist/lodash.backbone.min.js"></script>               
+        <script src="/static/app/components/mustache/mustache.js"></script>
+        <script src="/static/app/components/backbone/backbone.js"></script>
         <!-- endbuild -->
 
         <!-- build:js(.tmp) scripts/main.js -->
-        <script src="scripts/todo.js"></script>
+        <script src="/static/app/scripts/todo.js"></script>
         <!-- endbuild -->
 </body>
 </html>

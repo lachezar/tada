@@ -8,18 +8,36 @@ $(() ->
       }
 
     toggle: () ->
-      @save {done: not @get("done")}
+      @save({done: not @get("done")})
+    ,
   
+    #url: '/api/task/[id]'
   )
 
   TodoList = Backbone.Collection.extend(
 
     # Reference to this collection's model.
     model: Task,
+    
+    url: '/api/task',
 
     # Save all of the todo items under the `"todos-backbone"` namespace.
     #localStorage: new Backbone.LocalStorage("todos-backbone"),
     # add backend
+    
+    # fix flask restless collection json structure
+    parse: (response) ->
+      return response.objects
+    ,
+    
+    done: () ->
+      @where({done: true})
+    ,
+
+    # Filter down the list to only todo items that are still not finished.
+    remaining: () ->
+      @without.apply(@, @done());
+    ,
 
     nextOrder: () ->
       unless @length 
@@ -39,7 +57,7 @@ $(() ->
 
     tagName:  "li",
 
-    template: Handlebars.compile($('#task-template').html()),
+    template: Mustache.compile($('#task-template').html()),
 
     events: {
       "click .toggle": "toggleDone",
@@ -54,13 +72,17 @@ $(() ->
       @listenTo @model, 'destroy', @remove
 
     render: () ->
+      console.log(@model.toJSON(), @model.toJSON().title)
+      console.log(@template(@model.toJSON()))
+      console.log(@$el)
       @$el.html @template(@model.toJSON())
       @$el.toggleClass 'done', @model.get('done')
       @input = @$('.edit')
       @
     ,
-
+    
     toggleDone: () ->
+      console.log 333
       @model.toggle()
     ,
 
@@ -89,10 +111,10 @@ $(() ->
 
   AppView = Backbone.View.extend(
 
-    el: $("#todoapp"),
+    el: $(".container"),
     
     # Our template for the line of statistics at the bottom of the app.
-    remainingTemplate: Handlebars.compile($('#remaining-template').html()),
+    remainingTemplate: Mustache.compile($('#remaining-template').html()),
 
     events: {
       "keypress #new-todo":  "createOnEnter",
@@ -115,7 +137,9 @@ $(() ->
       @footer = @$('footer')
       @main = $('#main')
 
-      Todos.fetch()
+      #Todos.fetch() 
+      Todos.reset(preloadedTasks)
+      #Todos.each App.addOne, App
     ,
 
     # Re-rendering the App just means refreshing the statistics -- the rest
@@ -132,19 +156,24 @@ $(() ->
         @main.hide()
         @footer.hide()
 
-      @allCheckbox.checked = not remaining
+      #@allCheckbox.checked = not remaining
     ,
 
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.
-    addOne: (todo) ->
-      view = new TodoView({model: todo})
-      @$("#todo-list").append view.render().el
+    addOne: (task) ->
+      console.log(111) 
+      view = new TodoView({model: task})
+      @$("#task-list").append view.render().el
+    ,
+    
+    addPreloaded: (task) ->
+      new TodoView({model: task, el: $("li[data-id=#{task.id}]")})
     ,
 
     # Add all items in the **Todos** collection at once.
     addAll: () ->
-      Todos.each @.addOne, @
+      Todos.each @.addPreloaded, @
     ,
 
     # If you hit return in the main input field, create new **Todo** model,
