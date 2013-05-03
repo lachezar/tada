@@ -72,9 +72,6 @@ $(() ->
       @listenTo @model, 'destroy', @remove
 
     render: () ->
-      console.log(@model.toJSON(), @model.toJSON().title)
-      console.log(@template(@model.toJSON()))
-      console.log(@$el)
       @$el.html @template(@model.toJSON())
       @$el.toggleClass 'done', @model.get('done')
       @input = @$('.edit')
@@ -82,7 +79,6 @@ $(() ->
     ,
     
     toggleDone: () ->
-      console.log 333
       @model.toggle()
     ,
 
@@ -162,13 +158,13 @@ $(() ->
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.
     addOne: (task) ->
-      console.log(111) 
       view = new TodoView({model: task})
       @$("#task-list").append view.render().el
     ,
     
     addPreloaded: (task) ->
-      new TodoView({model: task, el: $("li[data-id=#{task.id}]")})
+      view = new TodoView({model: task, el: $("li[data-id=#{task.id}]")})
+      view.input = $("li[data-id=#{task.id}] .edit")
     ,
 
     # Add all items in the **Todos** collection at once.
@@ -179,7 +175,7 @@ $(() ->
     # If you hit return in the main input field, create new **Todo** model,
     # persisting it to *localStorage*.
     createOnEnter: (e) ->
-      return if e.keyCode != 13 or not @.input.val()
+      return if e.keyCode != 13 or not @input.val()
 
       Todos.create({title: @input.val()})
       @input.val('')
