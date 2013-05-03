@@ -28,7 +28,7 @@
                     <li data-id="{{ task.id }}" {%- if task.done -%}class="done"{% endif %}>
                         <div class="view">
                             <input class="toggle" type="checkbox" {%- if task.done -%}checked="checked"{% endif %}/>
-                            <label>{{ task.title }}</label>
+                            <label class="title">{{ task.title }}</label>
                             <span class="draggable"></span>
                         </div>
                         <input class="edit" type="text" value="{{ task.title }}" />
@@ -45,12 +45,29 @@
         <script type="text/javascript">
             var preloadedTasks = {{ tasks_dict|tojson|safe }};
         </script>
+
+        <!-- build:js scripts/vendor.js -->
+        <script src="/static/app/components/jquery/jquery.min.js"></script>
+        <script src="/static/app/components/lodash/dist/lodash.backbone.js"></script>
+        <script src="/static/app/components/mustache/mustache.js"></script>
+        <script src="/static/app/components/backbone/backbone.js"></script>
+        <script src="/static/app/components/jquery-ui/ui/jquery.ui.core.js"></script>
+        <script src="/static/app/components/jquery-ui/ui/jquery.ui.widget.js"></script>
+        <script src="/static/app/components/jquery-ui/ui/jquery.ui.mouse.js"></script>
+        <script src="/static/app/components/jquery-ui/ui/jquery.ui.sortable.js"></script>
+        <script src="/static/app/components/jqueryui-touch-punch/jquery.ui.touch-punch.js"></script>
+        <!-- endbuild -->
+
+        <!-- build:js(.tmp) scripts/main.js -->
+        <script src="/static/app/scripts/todo.js"></script>
+        <!-- endbuild -->
         
+        <!-- templates -->
         {% raw %}
         <script id="task-template" type="text/x-mustache-template">
             <div class="view">
               <input class="toggle" type="checkbox" {{#done}}checked="checked"{{/done}} />
-              <label>{{ title }}</label>
+              <label class="title">{{ title }}</label>
               <span class="draggable"></span>
             </div>
             <input class="edit" type="text" value="{{ title }}" />
@@ -58,16 +75,5 @@
         <script id="remaining-template" type="text/x-mustache-template">
         </script>
         {% endraw %}
-
-        <!-- build:js scripts/vendor.js -->
-        <script src="/static/app/components/jquery/jquery.min.js"></script>
-        <script src="/static/app/components/lodash/dist/lodash.backbone.min.js"></script>               
-        <script src="/static/app/components/mustache/mustache.js"></script>
-        <script src="/static/app/components/backbone/backbone.js"></script>
-        <!-- endbuild -->
-
-        <!-- build:js(.tmp) scripts/main.js -->
-        <script src="/static/app/scripts/todo.js"></script>
-        <!-- endbuild -->
 </body>
 </html>

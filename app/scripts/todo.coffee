@@ -40,10 +40,7 @@ $(() ->
     ,
 
     nextOrder: () ->
-      unless @length 
-        return 1
-    
-      @last().get('order') + 1
+      @length
     ,
 
     # Todos are sorted by their original insertion order.
@@ -61,7 +58,7 @@ $(() ->
 
     events: {
       "click .toggle": "toggleDone",
-      "dblclick .view": "edit",
+      "click .title": "edit",
       "click a.destroy": "clear",
       "keypress .edit": "updateOnEnter",
       "blur .edit": "close"
@@ -74,6 +71,7 @@ $(() ->
     render: () ->
       @$el.html @template(@model.toJSON())
       @$el.toggleClass 'done', @model.get('done')
+      @el.dataset.id = @model.id # set data-id to the li element
       @input = @$('.edit')
       @
     ,
@@ -127,9 +125,9 @@ $(() ->
       @input = @$("#new-todo")
       @allCheckbox = @$("#toggle-all")[0]
 
-      @listenTo Todos, 'add', this.addOne
-      @listenTo Todos, 'reset', this.addAll
-      @listenTo Todos, 'all', this.render
+      @listenTo Todos, 'add', @addOne
+      @listenTo Todos, 'reset', @addAll
+      #@listenTo Todos, 'all', @render
 
       @footer = @$('footer')
       @main = @$('#main')
@@ -137,11 +135,14 @@ $(() ->
       #Todos.fetch() 
       Todos.reset(preloadedTasks)
       #Todos.each App.addOne, App
+      
+      $("#task-list").sortable({handle: ".draggable", stop: @sort});
+      $("#task-list").disableSelection();
     ,
 
     # Re-rendering the App just means refreshing the statistics -- the rest
     # of the app doesn't change.
-    render: () ->
+    ###render: () ->
       done = Todos.done().length
       remaining = Todos.remaining().length
 
@@ -154,13 +155,15 @@ $(() ->
         @footer.hide()
 
       #@allCheckbox.checked = not remaining
-    ,
+    ,###
 
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.
     addOne: (task) ->
       view = new TodoView({model: task})
-      @$("#task-list").append view.render().el
+      @$("#task-list")
+        .append(view.render().el)
+        .sortable('refresh')
     ,
     
     addPreloaded: (task) ->
@@ -183,14 +186,25 @@ $(() ->
     ,
     
     # Clear all done todo items, destroying their models.
-    clearCompleted: () ->
+    clearCompleted: () -> #not needed
       _.invoke Todos.done(), 'destroy'
       false
     ,
 
     toggleAllComplete: () ->
       done = @allCheckbox.checked
-      Todos.each (todo) -> todo.save({'done': done})
+      Todos.each (task) -> task.save({'done': done})
+    ,
+    
+    sort: (event, ui) ->
+      $("#task-list li").map(
+        (i, e) ->
+          id = e.dataset.id
+          task = Todos.get(id)
+          if task.get('order') != i
+            task.save({'order': i})
+      )
+    ,
   
 
   )
