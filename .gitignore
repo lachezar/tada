@@ -5,3 +5,5 @@ dist
 .sass-cache
 app/components
 app/scripts/todo.js
+app/styles/main.css
+

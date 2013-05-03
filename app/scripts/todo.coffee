@@ -113,7 +113,8 @@ $(() ->
     remainingTemplate: Mustache.compile($('#remaining-template').html()),
 
     events: {
-      "keypress #new-todo":  "createOnEnter",
+      "keypress #new-todo": "createNewTask",
+      "click .add-button": "createNewTask",
       "click #clear-completed": "clearCompleted",
       "click #toggle-all": "toggleAllComplete"
     },
@@ -131,7 +132,7 @@ $(() ->
       @listenTo Todos, 'all', this.render
 
       @footer = @$('footer')
-      @main = $('#main')
+      @main = @$('#main')
 
       #Todos.fetch() 
       Todos.reset(preloadedTasks)
@@ -163,8 +164,8 @@ $(() ->
     ,
     
     addPreloaded: (task) ->
-      view = new TodoView({model: task, el: $("li[data-id=#{task.id}]")})
-      view.input = $("li[data-id=#{task.id}] .edit")
+      view = new TodoView({model: task, el: @$("li[data-id=#{task.id}]")})
+      view.input = @$("li[data-id=#{task.id}] .edit")
     ,
 
     # Add all items in the **Todos** collection at once.
@@ -174,13 +175,13 @@ $(() ->
 
     # If you hit return in the main input field, create new **Todo** model,
     # persisting it to *localStorage*.
-    createOnEnter: (e) ->
-      return if e.keyCode != 13 or not @input.val()
+    createNewTask: (e) ->
+      return if (e.keyCode and e.keyCode != 13) or not @input.val()
 
       Todos.create({title: @input.val()})
       @input.val('')
     ,
-
+    
     # Clear all done todo items, destroying their models.
     clearCompleted: () ->
       _.invoke Todos.done(), 'destroy'

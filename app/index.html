@@ -9,6 +9,7 @@
         <title>Ta-da. It's short for da-ta-ta-da.</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
+        <link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
         <link rel="stylesheet" href="/static/app/styles/main.css">
         <!-- build:js scripts/vendor/modernizr.js -->
@@ -20,13 +21,15 @@
             <div class="hero-unit">
                 <h1>Tada</h1>
                 <input id="new-todo" type="text" placeholder="What needs to be done?" />
+                <button class="add-button">Add task</button>
                 <p>Your tasks are:</p>
                 <ul id="task-list">
                     {% for task in tasks %}
-                    <li data-id="{{ task.id }}">
+                    <li data-id="{{ task.id }}" {%- if task.done -%}class="done"{% endif %}>
                         <div class="view">
                             <input class="toggle" type="checkbox" {%- if task.done -%}checked="checked"{% endif %}/>
                             <label>{{ task.title }}</label>
+                            <span class="draggable"></span>
                         </div>
                         <input class="edit" type="text" value="{{ task.title }}" />
                     </li>
@@ -48,6 +51,7 @@
             <div class="view">
               <input class="toggle" type="checkbox" {{#done}}checked="checked"{{/done}} />
               <label>{{ title }}</label>
+              <span class="draggable"></span>
             </div>
             <input class="edit" type="text" value="{{ title }}" />
         </script>

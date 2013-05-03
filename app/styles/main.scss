@@ -1,0 +1,70 @@
+@import '../../bourbon/bourbon';
+
+$control_green: #5e9e2e;
+
+body {
+  background: #fafafa;
+  font: 14px/18px Arial;
+}
+
+h1 {
+  font-family: 'Lobster', cursive;
+}
+
+.hero-unit {
+  margin: 50px auto 0 auto;
+  width: 300px; 
+}
+
+@mixin cupid-green {
+  @include linear-gradient(top, #7fbf4d, #63a62f);
+  border: 1px solid #63a62f;
+  border-bottom: 1px solid #5b992b;
+  border-radius: 3px;
+  @include box-shadow(inset 0 1px 0 0 #96ca6d);
+  color: #fff;
+  font: bold 11px/1 "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  padding: 7px 0 8px 0;
+  text-align: center;
+  text-shadow: 0 -1px 0 #4c9021;
+  width: 80px;
+
+  &:hover {
+    @include linear-gradient(top, #76b347, $control_green);
+    @include box-shadow(inset 0 1px 0 0 #8dbf67);
+    cursor: pointer;
+  }
+
+  &:active {
+    border: 1px solid #5b992b;
+    border-bottom: 1px solid #538c27;
+    @include box-shadow(inset 0 0 8px 4px #548c29, 0 1px 0 0 #eee);
+  }
+}
+
+.add-button {
+  @include cupid-green;
+}
+
+#task-list li.done label {
+  color: #777777;
+  text-decoration: line-through;
+}
+
+.draggable {
+  float: right;
+  font: 16px/16px serif; // body font definition messing up the navicon
+  position: relative;
+  padding-left: 1.25em;
+
+  &:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.25em;
+    width: 0.75em;
+    height: 0.15em;
+    background: $control_green;
+    box-shadow: 0 0.25em 0 0 $control_green, 0 0.5em 0 0 $control_green;
+  }
+}
