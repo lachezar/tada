@@ -127,11 +127,8 @@ h1 {
   }
 }
 
-.clearfix:after {
-    content: ".";
-    display: block;
-    height: 0;
-    clear: both;
-    visibility: hidden;
+@media only screen and (max-device-width : 480px) {
+  .hide_mobile {
+    display: none;
+  }
 }
-
