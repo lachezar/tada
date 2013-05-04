@@ -30,8 +30,8 @@
                 <li data-id="{{ task.id }}" {%- if task.done -%}class="done"{% endif %}>
                     <div class="view">
                         <input class="toggle" type="checkbox" {%- if task.done -%}checked="checked"{% endif %}/>
-                        <label class="title">{{ task.title }}</label>
-                        <span class="draggable"></span>
+                        <label class="title" title="click to edit">{{ task.title }}</label>
+                        <span class="draggable" title="drag to change order"></span>
                     </div>
                     <input class="edit" type="text" value="{{ task.title }}" />
                 </li>
@@ -81,8 +81,8 @@
         <script id="task-template" type="text/x-mustache-template">
             <div class="view">
               <input class="toggle" type="checkbox" {{#done}}checked="checked"{{/done}} />
-              <label class="title">{{ title }}</label>
-              <span class="draggable"></span>
+              <label class="title" title="click to edit">{{ title }}</label>
+              <span class="draggable" title="drag to change order"></span>
             </div>
             <input class="edit" type="text" value="{{ title }}" />
         </script>
