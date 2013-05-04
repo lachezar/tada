@@ -3,7 +3,7 @@ $(() ->
     defaults: () ->
       {
         title: "empty todo...",
-        order: Todos.nextOrder(),
+        next_id: null,
         done: false
       }
 
@@ -39,12 +39,8 @@ $(() ->
       @without.apply(@, @done());
     ,
 
-    nextOrder: () ->
-      @length
-    ,
-
-    # Todos are sorted by their original insertion order.
-    comparator: 'order'
+    # Todos are sorted by their original insertion next_id.
+    comparator: 'next_id'
 
   )
 
@@ -64,16 +60,29 @@ $(() ->
       "blur .edit": "close"
     },
 
-    initialize: () ->
+    initialize: (options) ->
       @listenTo @model, 'change', @render
-      @listenTo @model, 'destroy', @remove
+      @listenTo @model, 'change:id', @changeAndResort
+      @listenTo @model, 'destroy', @removeAndResort
+      @vent = options.vent
+    ,
 
     render: () ->
       @$el.html @template(@model.toJSON())
       @$el.toggleClass 'done', @model.get('done')
-      @el.dataset.id = @model.id # set data-id to the li element
       @input = @$('.edit')
       @
+    ,
+    
+    changeAndResort: () ->
+      @el.dataset.id = @model.id # set data-id to the li element
+      @vent.trigger('sort')
+      console.log 'trigger sort'
+    ,
+    
+    removeAndResort: () ->
+      @remove()
+      @vent.trigger('sort')
     ,
     
     toggleDone: () ->
@@ -120,7 +129,7 @@ $(() ->
     # At initialization we bind to the relevant events on the `Todos`
     # collection, when items are added or changed. Kick things off by
     # loading any preexisting todos that might be saved in *localStorage*.
-    initialize: () ->
+    initialize: (options) ->
 
       @input = @$("#new-todo")
       @allCheckbox = @$("#toggle-all")[0]
@@ -136,8 +145,12 @@ $(() ->
       Todos.reset(preloadedTasks)
       #Todos.each App.addOne, App
       
-      $("#task-list").sortable({handle: ".draggable", stop: @sort});
-      $("#task-list").disableSelection();
+      $("#task-list").sortable({handle: ".draggable", stop: @sort})
+      $("#task-list").disableSelection()
+      
+      _.bindAll(@, 'sort')
+      options.vent.bind('sort', @sort)
+
     ,
 
     # Re-rendering the App just means refreshing the statistics -- the rest
@@ -160,14 +173,14 @@ $(() ->
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.
     addOne: (task) ->
-      view = new TodoView({model: task})
+      view = new TodoView({model: task, vent: vent})
       @$("#task-list")
         .append(view.render().el)
         .sortable('refresh')
     ,
     
     addPreloaded: (task) ->
-      view = new TodoView({model: task, el: @$("li[data-id=#{task.id}]")})
+      view = new TodoView({model: task, el: @$("li[data-id=#{task.id}]"), vent: vent})
       view.input = @$("li[data-id=#{task.id}] .edit")
     ,
 
@@ -196,18 +209,23 @@ $(() ->
       Todos.each (task) -> task.save({'done': done})
     ,
     
-    sort: (event, ui) ->
-      $("#task-list li").map(
-        (i, e) ->
-          id = e.dataset.id
-          task = Todos.get(id)
-          if task.get('order') != i
-            task.save({'order': i})
-      )
+    sort: () ->
+      ids = $("#task-list").sortable('toArray', {'attribute': 'data-id'})
+      console.log ids
+
+      prevTask = Todos.get(ids[0])
+      for id in ids.slice(1)
+        if prevTask.get('next_id') != +id # +id to make it int
+          prevTask.save({'next_id': id})
+        prevTask = Todos.get(id)
+        
+      if prevTask and prevTask.get('next_id') != null
+        prevTask.save({'next_id': null})
     ,
   
 
   )
 
-  App = new AppView
+  vent = _.extend({}, Backbone.Events)
+  App = new AppView({vent: vent})
 )
