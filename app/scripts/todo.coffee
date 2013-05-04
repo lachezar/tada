@@ -2,29 +2,21 @@ $(() ->
   Task = Backbone.Model.extend(
     defaults: () ->
       {
-        title: "empty todo...",
+        title: "...",
         next_id: null,
         done: false
       }
 
     toggle: () ->
       @save({done: not @get("done")})
-    ,
-  
-    #url: '/api/task/[id]'
   )
 
-  TodoList = Backbone.Collection.extend(
+  TaskList = Backbone.Collection.extend(
 
-    # Reference to this collection's model.
     model: Task,
     
     url: '/api/task',
 
-    # Save all of the todo items under the `"todos-backbone"` namespace.
-    #localStorage: new Backbone.LocalStorage("todos-backbone"),
-    # add backend
-    
     # fix flask restless collection json structure
     parse: (response) ->
       return response.objects
@@ -39,48 +31,47 @@ $(() ->
       @without.apply(@, @done());
     ,
 
-    # Todos are sorted by their original insertion next_id.
+    # next_id is pointing to the following task in the linkd list,
+    # so technically we are not sorting by this.
     comparator: 'next_id'
 
   )
 
-  Todos = new TodoList
+  Tasks = new TaskList
 
-  TodoView = Backbone.View.extend(
+  TaskView = Backbone.View.extend(
 
     tagName:  "li",
 
-    template: Mustache.compile($('#task-template').html()),
+    template: Mustache.compile($("#task-template").html()),
 
     events: {
       "click .toggle": "toggleDone",
       "click .title": "edit",
-      "click a.destroy": "clear",
       "keypress .edit": "updateOnEnter",
       "blur .edit": "close"
     },
 
     initialize: (options) ->
       @listenTo @model, 'change', @render
-      @listenTo @model, 'change:id', @changeAndResort
-      @listenTo @model, 'destroy', @removeAndResort
+      @listenTo @model, 'change:id', @changeAndSort
+      @listenTo @model, 'destroy', @removeAndSort
       @vent = options.vent
     ,
 
     render: () ->
       @$el.html @template(@model.toJSON())
-      @$el.toggleClass 'done', @model.get('done')
+      @$el.toggleClass('done', @model.get('done'))
       @input = @$('.edit')
       @
     ,
     
-    changeAndResort: () ->
+    changeAndSort: () ->
       @el.dataset.id = @model.id # set data-id to the li element
       @vent.trigger('sort')
-      console.log 'trigger sort'
     ,
     
-    removeAndResort: () ->
+    removeAndSort: () ->
       @remove()
       @vent.trigger('sort')
     ,
@@ -90,15 +81,19 @@ $(() ->
     ,
 
     edit: () ->
-      @$el.addClass "editing"
+      @$el.addClass('editing')
       @input.focus()
     ,
 
     close: () ->
-      value = @input.val()
-      if value
-        @model.save {title: value}
-        @$el.removeClass "editing"
+      newTitle = @input.val()
+      
+      if newTitle  
+        if newTitle != @model.get('title')
+          console.log newTitle, @model.get('title')
+          @model.save {title: newTitle}
+          
+        @$el.removeClass('editing')
       else
         @clear()
     ,
@@ -116,116 +111,124 @@ $(() ->
 
     el: $(".container"),
     
-    # Our template for the line of statistics at the bottom of the app.
-    remainingTemplate: Mustache.compile($('#remaining-template').html()),
-
     events: {
       "keypress #new-todo": "createNewTask",
       "click .add-button": "createNewTask",
-      "click #clear-completed": "clearCompleted",
-      "click #toggle-all": "toggleAllComplete"
+      "click #complete-all-checkbox": "completeAllTasks"
     },
 
-    # At initialization we bind to the relevant events on the `Todos`
-    # collection, when items are added or changed. Kick things off by
-    # loading any preexisting todos that might be saved in *localStorage*.
     initialize: (options) ->
 
       @input = @$("#new-todo")
-      @allCheckbox = @$("#toggle-all")[0]
+      @completeAll = @$("#complete-all")
+      @remaining = @$("#complete-all .remaining")
 
-      @listenTo Todos, 'add', @addOne
-      @listenTo Todos, 'reset', @addAll
-      #@listenTo Todos, 'all', @render
+      @listenTo Tasks, 'add', @addOne
+      @listenTo Tasks, 'reset', @addAll
+      @listenTo Tasks, 'all', @render
 
       @footer = @$('footer')
       @main = @$('#main')
 
-      #Todos.fetch() 
-      Todos.reset(preloadedTasks)
-      #Todos.each App.addOne, App
+      # since all tasks' html is served by the server,
+      # load from an embedded JSON structure.
+      Tasks.reset(preloadedTasks)
       
-      $("#task-list").sortable({handle: ".draggable", stop: @sort})
-      $("#task-list").disableSelection()
+      # make the list sortable, except the "complete all" element
+      @$("#task-list").sortable(
+        {
+          handle: ".draggable", 
+          stop: @sort, 
+          cursor: 'move',
+          items: ">li[data-id]"
+        }
+      )
+      @$("#task-list").disableSelection()
       
       _.bindAll(@, 'sort')
       options.vent.bind('sort', @sort)
+      # whoever triggers sort event will sort the tasks
 
     ,
 
     # Re-rendering the App just means refreshing the statistics -- the rest
     # of the app doesn't change.
-    ###render: () ->
-      done = Todos.done().length
-      remaining = Todos.remaining().length
-
-      if Todos.length
-        @main.show()
-        @footer.show()
-        @footer.html @remainingTemplate({done: done, remaining: remaining})
+    render: () ->
+      remaining = Tasks.remaining().length
+      
+      if remaining > 1
+        @remaining.html remaining
+        @completeAll.show()
       else
-        @main.hide()
-        @footer.hide()
-
-      #@allCheckbox.checked = not remaining
-    ,###
+        @completeAll.hide()
+    ,
 
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.
     addOne: (task) ->
-      view = new TodoView({model: task, vent: vent})
-      @$("#task-list")
-        .append(view.render().el)
-        .sortable('refresh')
+      view = new TaskView({model: task, vent: vent})
+      @$("#task-list").append(view.render().el)
+      # handle the task to mark all completed
+      @completeAll.insertAfter("#task-list li:last")
+      # must execute sortable 'refresh' with delay, 
+      # but jQuery delay does not work for us
+      setTimeout( 
+        () =>
+          @$("#task-list").sortable('refresh')
+        , 100)
     ,
     
+    # Add preloaded task without rendering
     addPreloaded: (task) ->
-      view = new TodoView({model: task, el: @$("li[data-id=#{task.id}]"), vent: vent})
+      view = new TaskView({model: task, el: @$("li[data-id=#{task.id}]"), vent: vent})
       view.input = @$("li[data-id=#{task.id}] .edit")
     ,
 
-    # Add all items in the **Todos** collection at once.
+    # Add all items in the **Tasks** collection at once.
     addAll: () ->
-      Todos.each @.addPreloaded, @
+      Tasks.each @.addPreloaded, @
     ,
 
-    # If you hit return in the main input field, create new **Todo** model,
-    # persisting it to *localStorage*.
+    # If you hit return in the main input field, create new Task
     createNewTask: (e) ->
       return if (e.keyCode and e.keyCode != 13) or not @input.val()
 
-      Todos.create({title: @input.val()})
+      Tasks.create({title: @input.val()})
       @input.val('')
     ,
     
-    # Clear all done todo items, destroying their models.
-    clearCompleted: () -> #not needed
-      _.invoke Todos.done(), 'destroy'
-      false
-    ,
-
-    toggleAllComplete: () ->
-      done = @allCheckbox.checked
-      Todos.each (task) -> task.save({'done': done})
+    completeAllTasks: () ->
+      $.ajax('/api/task/complete-all', {type: 'PATCH'})
+        .then(() => 
+          @$("#complete-all :checkbox").removeAttr('checked')
+          Tasks.each (task) -> task.set({'done': true})
+      )
     ,
     
+    # After the ordering event is completed by jQuery
+    # it is our turn to send the patch of the linked list to the server.
+    # It should take up to 3 requests at most - one for the moved task,
+    # one for the previous task of the old position and one for the
+    # previous task on the new postion on which the task was moved.
     sort: () ->
       ids = $("#task-list").sortable('toArray', {'attribute': 'data-id'})
       console.log ids
 
-      prevTask = Todos.get(ids[0])
+      prevTask = Tasks.get(ids[0])
       for id in ids.slice(1)
         if prevTask.get('next_id') != +id # +id to make it int
           prevTask.save({'next_id': id})
-        prevTask = Todos.get(id)
+        prevTask = Tasks.get(id)
         
       if prevTask and prevTask.get('next_id') != null
+        # last element points to null
         prevTask.save({'next_id': null})
     ,
   
 
   )
 
+  # used to transmit events between the AppView and the TaskView
   vent = _.extend({}, Backbone.Events)
   App = new AppView({vent: vent})
 )

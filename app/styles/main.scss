@@ -1,6 +1,8 @@
 @import '../../bourbon/bourbon';
 
 $control_green: #5e9e2e;
+$dark_gray: #777777;
+$lobster: 'Lobster', cursive;
 
 body {
   background: #fafafa;
@@ -8,12 +10,29 @@ body {
 }
 
 h1 {
-  font-family: 'Lobster', cursive;
+  font-family: $lobster;
 }
 
-.hero-unit {
-  margin: 50px auto 0 auto;
-  width: 300px; 
+.container {
+  margin: 30px auto 0 auto;
+  width: 300px;
+  
+  input[type="text"] {
+    width: 200px;
+    font-size: 1em;
+    font-family: inherit;
+    border: 0;
+    outline: none;
+    padding: 5px;
+    border: 1px solid #999999;
+    @include box-shadow(inset 0 1px 2px 0 rgba(0, 0, 0, 0.2));
+  }
+  
+  footer {
+    margin-top: 10px;
+    font-family: $lobster;
+    color: #C4C5C4;
+  }
 }
 
 @mixin cupid-green {
@@ -24,7 +43,7 @@ h1 {
   @include box-shadow(inset 0 1px 0 0 #96ca6d);
   color: #fff;
   font: bold 11px/1 $lucida-grande;
-  padding: 7px 0 8px 0;
+  padding: 8px 0 8px 0;
   text-align: center;
   text-shadow: 0 -1px 0 #4c9021;
   width: 80px;
@@ -55,13 +74,17 @@ h1 {
   li {
     padding: 4px 0;
     
+    &:nth-child(even) { 
+      background-color:#fff; 
+    }
+    
     .title {
       padding-left: 4px;
     }
   }
   
   li.done label {
-    color: #777777;
+    color: $dark_gray;
     text-decoration: line-through;
   }
   
@@ -83,20 +106,6 @@ h1 {
   }
 }
 
-.container {
-  input[type="text"] {
-    width: 200px;
-    font-size: 1.2em;
-    font-family: inherit;
-    border: 0;
-    outline: none;
-    padding: 5px;
-    border: 1px solid #999999;
-    @include box-shadow(inset 0 1px 2px 0 rgba(0, 0, 0, 0.2));
-  }
-  
-}
-
 .draggable {
   float: right;
   font: 16px/16px serif; /* body font definition messing up the navicon */
@@ -116,5 +125,13 @@ h1 {
     background: $control_green;
     box-shadow: 0 0.25em 0 0 $control_green, 0 0.5em 0 0 $control_green;
   }
+}
+
+.clearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
 }
 
