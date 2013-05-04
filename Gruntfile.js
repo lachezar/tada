@@ -17,7 +17,11 @@ module.exports = function (grunt) {
     // configurable paths
     var yeomanConfig = {
         app: 'app',
-        dist: 'dist'
+        dist: 'dist',
+        // find better way to define these dirs ->
+        prodDir: '../tada_backend/', 
+        prodStaticDir: '../tada_backend/static/', 
+        prodTemplatesDir: '../tada_backend/templates/',
     };
 
     grunt.initConfig({
@@ -158,7 +162,7 @@ module.exports = function (grunt) {
         uglify: {
             dist: {
                 files: {
-                    '<%= yeoman.dist %>/scripts/main.js': [
+                    '<%= yeoman.dist %>/static/scripts/main.js': [
                         '<%= yeoman.app %>/scripts/{,*/}*.js',
                         '.tmp/scripts/{,*/}*.js' // :-(
                     ],
@@ -232,6 +236,39 @@ module.exports = function (grunt) {
                         'images/{,*/}*.{webp,gif}'
                     ]
                 }]
+            },
+            release: {
+                files: [
+                {
+                    expand: true,
+                    dot: true,
+                    cwd: '<%= yeoman.dist %>',
+                    dest: '<%= yeoman.prodTemplatesDir %>',
+                    src: [
+                        '*.html',
+                    ]
+                },
+                {
+                    expand: true,
+                    dot: true,
+                    cwd: '<%= yeoman.dist %>',
+                    dest: '<%= yeoman.prodDir %>',
+                    src: [
+                        'static/scripts/{,*/}*.{,js}',
+                        'static/styles/{,*/}*.{,css}'
+                    ]
+                },
+                {
+                    expand: true,
+                    dot: true,
+                    cwd: '<%= yeoman.dist %>',
+                    dest: '<%= yeoman.prodStaticDir %>',
+                    src: [
+                        '*.{ico,txt}',
+                        '.htaccess',
+                        'images/{,*/}*.{webp,gif,png,jpeg}'
+                    ]
+                }]
             }
         },
         bower: {
@@ -245,6 +282,9 @@ module.exports = function (grunt) {
                     '.tmp/scripts/templates.js': ['<%= yeoman.app %>/scripts/templates/*.ejs']
                 }
             }
+        },
+        heroku: {
+          
         }
     });
 
@@ -266,7 +306,7 @@ module.exports = function (grunt) {
             'watch'
         ]);
     });
-
+    
     grunt.registerTask('test', [
         'clean:server',
         'coffee',
@@ -287,13 +327,19 @@ module.exports = function (grunt) {
         'concat',
         'cssmin',
         'uglify',
-        'copy',
+        'copy:dist',
         'usemin'
+    ]);
+    
+    grunt.registerTask('heroku', [
+        'build',
+        'copy:release'
     ]);
 
     grunt.registerTask('default', [
         'jshint',
         'test',
-        'build'
+        'build',
+        'heroku'
     ]);
 };

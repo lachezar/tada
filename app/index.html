@@ -11,9 +11,11 @@
         <meta name="viewport" content="width=device-width">
         <link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-        <link rel="stylesheet" href="/static/app/styles/main.css">
-        <!-- build:js scripts/vendor/modernizr.js -->
-        <script src="/static/app/components/modernizr/modernizr.js"></script>
+        <!-- build:css /static/styles/main.css -->
+        <link rel="stylesheet" href="/devstatic/app/styles/main.css">
+        <!-- endbuild -->
+        <!-- build:js /static/scripts/vendor/modernizr.js -->
+        <script src="/devstatic/app/components/modernizr/modernizr.js"></script>
         <!-- endbuild -->
     </head>
     <body>
@@ -46,20 +48,20 @@
             var preloadedTasks = {{ tasks|tojson|safe }};
         </script>
 
-        <!-- build:js scripts/vendor.js -->
-        <script src="/static/app/components/jquery/jquery.min.js"></script>
-        <script src="/static/app/components/lodash/dist/lodash.backbone.js"></script>
-        <script src="/static/app/components/mustache/mustache.js"></script>
-        <script src="/static/app/components/backbone/backbone.js"></script>
-        <script src="/static/app/components/jquery-ui/ui/jquery.ui.core.js"></script>
-        <script src="/static/app/components/jquery-ui/ui/jquery.ui.widget.js"></script>
-        <script src="/static/app/components/jquery-ui/ui/jquery.ui.mouse.js"></script>
-        <script src="/static/app/components/jquery-ui/ui/jquery.ui.sortable.js"></script>
-        <script src="/static/app/components/jqueryui-touch-punch/jquery.ui.touch-punch.js"></script>
+        <!-- build:js /static/scripts/vendor.js -->
+        <script src="/devstatic/app/components/jquery/jquery.min.js"></script>
+        <script src="/devstatic/app/components/lodash/dist/lodash.backbone.js"></script>
+        <script src="/devstatic/app/components/mustache/mustache.js"></script>
+        <script src="/devstatic/app/components/backbone/backbone.js"></script>
+        <script src="/devstatic/app/components/jquery-ui/ui/jquery.ui.core.js"></script>
+        <script src="/devstatic/app/components/jquery-ui/ui/jquery.ui.widget.js"></script>
+        <script src="/devstatic/app/components/jquery-ui/ui/jquery.ui.mouse.js"></script>
+        <script src="/devstatic/app/components/jquery-ui/ui/jquery.ui.sortable.js"></script>
+        <script src="/devstatic/app/components/jqueryui-touch-punch/jquery.ui.touch-punch.js"></script>
         <!-- endbuild -->
 
-        <!-- build:js(.tmp) scripts/main.js -->
-        <script src="/static/app/scripts/todo.js"></script>
+        <!-- build:js(.tmp) /static/scripts/main.js -->
+        <script src="/devstatic/app/scripts/todo.js"></script>
         <!-- endbuild -->
         
         <!-- templates -->
