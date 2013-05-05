@@ -175,7 +175,7 @@ $(() ->
       setTimeout( 
         () =>
           @$("#task-list").sortable('refresh')
-        , 100)
+        , 500)
     ,
     
     # Add preloaded task without rendering
