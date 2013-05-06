@@ -3,7 +3,7 @@ Tada
 
 Another simplistic todo app, so that you wont forget the milk and I will be able to try few cool libs.
 
-This repository holds the source code for building and developing the frontend part of the project. Parts of the source code were borrowed from Backbone's example Todo app. The code for the backend could be found here: [https://github.com/lucho870601/tada_backend](https://github.com/lucho870601/tada_backend).
+This repository holds the source code for building and developing the front-end part of the project. Parts of the source code were borrowed from Backbone's example Todo app. The code for the backend could be found here: [https://github.com/lucho870601/tada_backend](https://github.com/lucho870601/tada_backend).
 
 The project is build on the following goodies:
 
