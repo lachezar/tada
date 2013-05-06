@@ -52,11 +52,10 @@ $(() ->
       "blur .edit": "close"
     },
 
-    initialize: (options) ->
+    initialize: () ->
       @listenTo @model, 'change', @render
       @listenTo @model, 'change:id', @changeAndSort
       @listenTo @model, 'destroy', @removeAndSort
-      @vent = options.vent
     ,
 
     render: () ->
@@ -68,12 +67,12 @@ $(() ->
     
     changeAndSort: () ->
       @el.dataset.id = @model.id # set data-id to the li element
-      @vent.trigger('sort')
+      App.vent.trigger('sort')
     ,
     
     removeAndSort: () ->
       @remove()
-      @vent.trigger('sort')
+      App.vent.trigger('sort')
     ,
     
     toggleDone: () ->
@@ -116,6 +115,9 @@ $(() ->
       "click .add-button": "createNewTask",
       "click #complete-all-checkbox": "completeAllTasks"
     },
+    
+    # handle event between the views
+    vent: _.extend({}, Backbone.Events),
 
     initialize: (options) ->
 
@@ -145,10 +147,8 @@ $(() ->
       )
       @$("#task-list").disableSelection()
       
-      _.bindAll(@, 'sort')
-      options.vent.bind('sort', @sort)
       # whoever triggers sort event will sort the tasks
-
+      @vent.on('sort', @sort, @)
     ,
 
     # Re-rendering the App just means refreshing the statistics -- the rest
@@ -166,7 +166,7 @@ $(() ->
     # Add a single todo item to the list by creating a view for it, and
     # appending its element to the `<ul>`.
     addOne: (task) ->
-      view = new TaskView({model: task, vent: vent})
+      view = new TaskView({model: task})
       @$("#task-list").append(view.render().el)
       # handle the task to mark all completed
       @completeAll.insertAfter("#task-list li:last")
@@ -180,7 +180,7 @@ $(() ->
     
     # Add preloaded task without rendering
     addPreloaded: (task) ->
-      view = new TaskView({model: task, el: @$("li[data-id=#{task.id}]"), vent: vent})
+      view = new TaskView({model: task, el: @$("li[data-id=#{task.id}]")})
       view.input = @$("li[data-id=#{task.id}] .edit")
     ,
 
@@ -228,7 +228,5 @@ $(() ->
 
   )
 
-  # used to transmit events between the AppView and the TaskView
-  vent = _.extend({}, Backbone.Events)
-  App = new AppView({vent: vent})
+  App = new AppView
 )
