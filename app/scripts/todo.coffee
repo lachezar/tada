@@ -89,7 +89,6 @@ $(() ->
       
       if newTitle  
         if newTitle != @model.get('title')
-          console.log newTitle, @model.get('title')
           @model.save {title: newTitle}
           
         @$el.removeClass('editing')
@@ -199,9 +198,10 @@ $(() ->
     
     completeAllTasks: () ->
       $.ajax('/api/task/complete-all', {type: 'PATCH'})
-        .then(() => 
-          @$("#complete-all :checkbox").removeAttr('checked')
-          Tasks.each (task) -> task.set({'done': true})
+        .then(
+          () => 
+            @$("#complete-all :checkbox").removeAttr('checked')
+            Tasks.each (task) -> task.set({'done': true})
       )
     ,
     
@@ -212,7 +212,6 @@ $(() ->
     # previous task on the new postion on which the task was moved.
     sort: () ->
       ids = $("#task-list").sortable('toArray', {'attribute': 'data-id'})
-      console.log ids
 
       prevTask = Tasks.get(ids[0])
       for id in ids.slice(1)
