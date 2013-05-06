@@ -24,3 +24,9 @@ Demo
 
 Check it out: [http://ta-da.herokuapp.com/](http://ta-da.herokuapp.com/)
 
+Many thanks to...
+-----------------
+
+* Backbone's team for the great documentation and Todo example app.
+* Derick Bailey for the great [blog](http://lostechies.com/derickbailey/2012/04/03/revisiting-the-backbone-event-aggregator-lessons-learned/) he has with a lot of resources and great articles.
+
