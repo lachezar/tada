@@ -190,7 +190,7 @@ $(() ->
 
     # If you hit return in the main input field, create new Task
     createNewTask: (e) ->
-      return if (e.keyCode and e.keyCode != 13) or not @input.val()
+      return if (e.keyCode >= 0 and e.keyCode != 13) or not @input.val()
 
       Tasks.create({title: @input.val()})
       @input.val('')
