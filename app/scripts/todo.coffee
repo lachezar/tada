@@ -57,7 +57,7 @@ class TaskView extends Backbone.View
     @
     
   changeAndSort: () ->
-    @el.dataset.id = @model.id # set data-id to the li element
+    @$el.attr('data-id', @model.id)
     App.vent.trigger('sort')
     
   removeAndSort: () ->
