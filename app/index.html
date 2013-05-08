@@ -56,9 +56,22 @@
         <!-- fork me on github... if you like -->
         <a class="hide_mobile" href="https://github.com/lucho870601/tada"><img style="position: absolute; top: 0; right: 0; border: 0; width: 149px; height: 149px;" src="http://aral.github.com/fork-me-on-github-retina-ribbons/right-white@2x.png" alt="Fork me on GitHub"></a>
         
+        <!-- bootstrap data -->
         <script type="text/javascript">
             var preloadedTasks = {{ tasks|tojson|safe }};
         </script>
+        
+        <!-- templates -->
+        {% raw %}
+        <script id="task-template" type="text/x-mustache-template">
+            <div class="view">
+              <input class="toggle" type="checkbox" {{#done}}checked="checked"{{/done}} />
+              <label class="title" title="click to edit">{{ title }}</label>
+              <span class="draggable" title="drag to change order"></span>
+            </div>
+            <input class="edit" type="text" value="{{ title }}" />
+        </script>
+        {% endraw %}
 
         <!-- build:js /static/scripts/vendor.js -->
         <script src="/devstatic/app/components/jquery/jquery.min.js"></script>
@@ -76,16 +89,5 @@
         <script src="/devstatic/app/scripts/todo.js"></script>
         <!-- endbuild -->
         
-        <!-- templates -->
-        {% raw %}
-        <script id="task-template" type="text/x-mustache-template">
-            <div class="view">
-              <input class="toggle" type="checkbox" {{#done}}checked="checked"{{/done}} />
-              <label class="title" title="click to edit">{{ title }}</label>
-              <span class="draggable" title="drag to change order"></span>
-            </div>
-            <input class="edit" type="text" value="{{ title }}" />
-        </script>
-        {% endraw %}
 </body>
 </html>
