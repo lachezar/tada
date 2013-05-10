@@ -73,8 +73,8 @@ class TaskView extends Backbone.View
 
   close: () ->
     newTitle = @input.val()
-      
-    if newTitle  
+
+    if newTitle
       if newTitle != @model.get('title')
         @model.save {title: newTitle}
           
@@ -83,7 +83,7 @@ class TaskView extends Backbone.View
       @clear()
 
   updateOnEnter: (e) ->
-    @close() if e.keyCode == 13 
+    @close() if e.keyCode == 13
 
   clear: () ->
     @model.destroy()
@@ -124,8 +124,8 @@ class AppView extends Backbone.View
     # make the list sortable, except the "complete all" element
     @$("#task-list").sortable(
       {
-        handle: ".draggable", 
-        stop: @sort, 
+        handle: ".draggable",
+        stop: @sort,
         cursor: 'move',
         items: ">li[data-id]"
       }
@@ -153,9 +153,9 @@ class AppView extends Backbone.View
     @$("#task-list").append(view.render().el)
     # handle the task to mark all completed
     @completeAll.insertAfter("#task-list li:last")
-    # must execute sortable 'refresh' with delay, 
+    # must execute sortable 'refresh' with delay,
     # but jQuery delay does not work for us
-    setTimeout( 
+    setTimeout(
       () =>
         @$("#task-list").sortable('refresh')
       , 500)
@@ -177,11 +177,10 @@ class AppView extends Backbone.View
     @input.val('')
     
   completeAllTasks: () ->
-    $.ajax('/api/task/complete-all', {type: 'PATCH'})
-      .then(
-        () => 
-          @$("#complete-all :checkbox").removeAttr('checked')
-          @tasks.each (task) -> task.set({'done': true})
+    $.ajax('/api/task/complete-all', {type: 'PATCH'}).then(
+      () =>
+        @$("#complete-all :checkbox").removeAttr('checked')
+        @tasks.each (task) -> task.set({'done': true})
     )
     
   # After the ordering event is completed by jQuery
@@ -203,4 +202,3 @@ class AppView extends Backbone.View
       prevTask.save({'next_id': null})
 
 App = new AppView
-
